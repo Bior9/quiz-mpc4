@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiz Maths & Physique</title>
+<style>
+:root{--bg:#f5f6fa;--card:#fff;--text:#1b1f2a;--muted:#6b7280;--accent:#4f46e5;--ok:#16a34a;--ko:#dc2626;--line:#e5e7eb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141c;--card:#1c1f2b;--text:#eef0f6;--muted:#9aa1b2;--accent:#818cf8;--line:#2c3040}}
+:root[data-theme="dark"]{--bg:#12141c;--card:#1c1f2b;--text:#eef0f6;--muted:#9aa1b2;--accent:#818cf8;--line:#2c3040}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:flex;justify-content:center;min-height:100vh}
+.app{width:100%;max-width:480px;padding:20px}
+h1{font-size:22px;margin:8px 0 4px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:10px}
+.q{font-size:19px;font-weight:600;line-height:1.35;margin:0 0 16px}
+.opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--text);border:2px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;font-size:16px;cursor:pointer}
+.opt:active{transform:scale(.98)}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.opt.ko{border-color:var(--ko);background:color-mix(in srgb,var(--ko) 15%,transparent)}
+.exp{font-size:14px;color:var(--muted);margin:6px 0 14px;min-height:20px}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:600;width:100%;cursor:pointer}
+.btn.alt{background:transparent;color:var(--accent);border:2px solid var(--accent);margin-top:10px}
+.score{font-size:48px;font-weight:700;text-align:center;margin:10px 0}
+.center{text-align:center}
+.cats{display:flex;gap:8px;margin-bottom:16px}
+.cat{flex:1;padding:10px 4px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--text);font-size:15px;cursor:pointer}
+.cat.on{border-color:var(--accent);color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+var Q=[
+{c:"Maths",q:"Dérivée de f(x) = x²",o:["x","2x","x²","2"],a:1,e:"(xⁿ)' = n·xⁿ⁻¹, donc (x²)' = 2x."},
+{c:"Maths",q:"Résous : 2x + 6 = 14",o:["x = 3","x = 4","x = 5","x = 10"],a:1,e:"2x = 8, donc x = 4."},
+{c:"Maths",q:"Combien vaut sin(90°) ?",o:["0","1/2","1","−1"],a:2,e:"sin(90°) = 1."},
+{c:"Maths",q:"Valeur de ln(1) ?",o:["1","e","0","Indéfini"],a:2,e:"ln(1) = 0 car e⁰ = 1."},
+{c:"Maths",q:"Somme des angles d'un triangle ?",o:["90°","180°","270°","360°"],a:1,e:"Toujours 180° dans le plan."},
+{c:"Maths",q:"Intégrale de 1/x ?",o:["ln|x| + C","x² + C","1/x² + C","e^x + C"],a:0,e:"La primitive de 1/x est ln|x| + C."},
+{c:"Physique",q:"Unité de la force dans le SI ?",o:["Joule","Watt","Newton","Pascal"],a:2,e:"Le Newton (N) = kg·m/s²."},
+{c:"Physique",q:"Loi d'Ohm ?",o:["U = R·I","P = U/I","E = m·c","F = m·a"],a:0,e:"Tension = Résistance × Intensité."},
+{c:"Physique",q:"Vitesse de la lumière (environ) ?",o:["300 000 m/s","3×10⁸ m/s","3×10⁶ m/s","340 m/s"],a:1,e:"c ≈ 3×10⁸ m/s dans le vide."},
+{c:"Physique",q:"Seconde loi de Newton ?",o:["F = m·a","E = mc²","V = R·I","P = m·g²"],a:0,e:"La somme des forces = masse × accélération."},
+{c:"Physique",q:"Accélération de la pesanteur sur Terre ?",o:["1,6 m/s²","9,8 m/s²","98 m/s²","3,7 m/s²"],a:1,e:"g ≈ 9,8 m/s²."},
+{c:"Physique",q:"Unité de l'énergie ?",o:["Watt","Newton","Volt","Joule"],a:3,e:"Le Joule (J). Le Watt mesure la puissance."},
+{c:"Chimie",q:"Symbole chimique de l'eau ?",o:["HO","H₂O","O₂","CO₂"],a:1,e:"2 atomes d'hydrogène + 1 d'oxygène."},
+{c:"Chimie",q:"Un pH de 7 est…",o:["Acide","Basique","Neutre","Radioactif"],a:2,e:"pH 7 = neutre, comme l'eau pure."},
+{c:"Chimie",q:"Numéro atomique du carbone ?",o:["6","8","12","14"],a:0,e:"Le carbone a 6 protons (Z = 6)."},
+{c:"Maths",q:"Combien font 7 × 8 ?",o:["54","56","48","64"],a:1,e:"7 × 8 = 56.",d:1},
+{c:"Physique",q:"Unité de la tension électrique ?",o:["Ampère","Ohm","Volt","Watt"],a:2,e:"La tension se mesure en Volt (V).",d:1},
+{c:"Chimie",q:"Symbole chimique de l'oxygène ?",o:["O","Or","Ox","Og"],a:0,e:"O, de numéro atomique 8.",d:1},
+{c:"Chimie",q:"Symbole chimique du sodium ?",o:["So","Na","S","N"],a:1,e:"Na vient du latin natrium.",d:1},
+{c:"Maths",q:"Discriminant de x² − 5x + 6 ?",o:["1","25","−1","49"],a:0,e:"Δ = b² − 4ac = 25 − 24 = 1.",d:2},
+{c:"Physique",q:"Énergie cinétique d'une masse m à la vitesse v ?",o:["mv","½mv²","mv²","½mv"],a:1,e:"Ec = ½·m·v².",d:2},
+{c:"Maths",q:"Limite de sin(x)/x quand x → 0 ?",o:["0","1","∞","−1"],a:1,e:"Limite classique : elle vaut 1.",d:3},
+{c:"Maths",q:"Dérivée de e^(2x) ?",o:["e^(2x)","2e^(2x)","2x·e^x","e^x"],a:1,e:"(e^u)' = u'·e^u, avec u = 2x.",d:3},
+{c:"Maths",q:"Intégrale de 0 à π de sin(x) dx ?",o:["0","1","2","π"],a:2,e:"[−cos x] de 0 à π = 1 − (−1) = 2.",d:3},
+{c:"Physique",q:"Période d'un pendule simple de longueur L ?",o:["2π√(L/g)","2π√(g/L)","π√(L/g)","2πL/g"],a:0,e:"T = 2π√(L/g).",d:3},
+{c:"Physique",q:"Résistance équivalente de 2 résistances R en parallèle ?",o:["2R","R","R/2","R²"],a:2,e:"1/Req = 1/R + 1/R = 2/R, donc Req = R/2.",d:3},
+{c:"Chimie",q:"Masse molaire de CO₂ (C = 12, O = 16) ?",o:["28","44","32","56"],a:1,e:"12 + 2×16 = 44 g/mol.",d:3},
+{c:"Chimie",q:"Combien de moles dans 36 g d'eau (M = 18 g/mol) ?",o:["1","2","3","0,5"],a:1,e:"n = m/M = 36/18 = 2 mol.",d:3}
+];
+[2,1,1,2,1,3,1,1,2,2,1,1,1,2,2].forEach(function(v,k){Q[k].d=v});
+var app=document.getElementById("app"),cat="Tout",lvl=1,list=[],i=0,score=0,done=false;
+function best(){try{return +localStorage.getItem("quiz_best")||0}catch(e){return 0}}
+function saveBest(v){try{localStorage.setItem("quiz_best",v)}catch(e){}}
+function shuffle(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var t=a[k];a[k]=a[j];a[j]=t}return a}
+function home(){
+  var cs=["Tout","Maths","Physique","Chimie"];
+  app.innerHTML='<h1>🧠 Quiz Maths & Physique</h1><div class="sub">Meilleur score : '+best()+' / 10</div><div class="card"><p style="margin-top:0">Choisis ta matière :</p><div class="cats">'+cs.map(function(c){return '<button class="cat'+(c==cat?' on':'')+'" data-c="'+c+'">'+c+'</button>'}).join("")+'</div><p>Niveau :</p><div class="cats">'+[[1,"Facile"],[2,"Moyen"],[3,"Difficile"]].map(function(l){return '<button class="cat lv'+(l[0]==lvl?' on':'')+'" data-l="'+l[0]+'">'+l[1]+'</button>'}).join("")+'</div><button class="btn" id="go">Commencer (10 questions)</button></div>';
+  app.querySelectorAll(".cat:not(.lv)").forEach(function(b){b.onclick=function(){cat=b.dataset.c;home()}});
+  app.querySelectorAll(".lv").forEach(function(b){b.onclick=function(){lvl=+b.dataset.l;home()}});
+  document.getElementById("go").onclick=start;
+}
+function start(){
+  var pool=Q.filter(function(x){return (cat=="Tout"||x.c==cat)&&x.d==lvl});
+  list=shuffle(pool).slice(0,10);i=0;score=0;show();
+}
+function show(){
+  var x=list[i];done=false;
+  app.innerHTML='<div class="card"><div class="bar"><i style="width:'+(i/list.length*100)+'%"></i></div><div class="meta"><span>'+x.c+' · '+["","Facile","Moyen","Difficile"][x.d]+'</span><span>Question '+(i+1)+'/'+list.length+' · Score '+score+'</span></div><p class="q">'+x.q+'</p><div id="opts"></div><div class="exp" id="exp"></div><button class="btn" id="next" style="display:none">'+(i==list.length-1?"Voir mon score":"Suivant →")+'</button></div>';
+  var box=document.getElementById("opts");
+  x.o.forEach(function(t,k){var b=document.createElement("button");b.className="opt";b.textContent=t;b.onclick=function(){pick(k,b)};box.appendChild(b)});
+  document.getElementById("next").onclick=function(){i++;i<list.length?show():end()};
+}
+function pick(k,btn){
+  if(done)return;done=true;var x=list[i],bs=document.querySelectorAll(".opt");
+  bs[x.a].classList.add("ok");
+  if(k==x.a){score++}else{btn.classList.add("ko")}
+  document.getElementById("exp").textContent=(k==x.a?"✅ Bien joué ! ":"❌ Raté. ")+x.e;
+  document.getElementById("next").style.display="block";
+}
+function end(){
+  var nb=score>best();if(nb)saveBest(score);
+  var n=list.length,m=score/n>=.8?"🔥 Excellent !":score/n>=.5?"👍 Pas mal, continue !":"💪 Réessaie, tu vas progresser !";
+  app.innerHTML='<div class="card center"><h1>Résultat</h1><div class="score">'+score+' / '+n+'</div><p>'+m+(nb?"<br>🏆 Nouveau record !":"")+'</p><button class="btn" id="again">Rejouer</button><button class="btn alt" id="menu">Changer de matière</button></div>';
+  document.getElementById("again").onclick=start;
+  document.getElementById("menu").onclick=home;
+}
+home();
+</script>
+</body>
+</html>

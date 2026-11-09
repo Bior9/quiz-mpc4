@@ -1,0 +1,15 @@
+QUIZ MPC - projet Android (Capacitor)
+
+1. Cree un compte gratuit sur github.com
+2. Nouveau depot (New repository) : nom "quiz-mpc", Public, Create.
+3. Clique "uploading an existing file" et glisse TOUT le contenu du dossier
+   (www, package.json, capacitor.config.json, .github).
+   Si le dossier .github n'est pas pris (frequent sur telephone, car il est
+   cache) : Add file > Create new file, nom ".github/workflows/build.yml"
+   (tape les "/" pour creer les dossiers) et colle le contenu de build.yml.
+4. Commit changes. Va dans l'onglet "Actions" : "Build APK" tourne (~5 min).
+5. Quand c'est vert : clique dessus > Artifacts > quiz-apk (telechargement).
+6. Dezippe, envoie app-debug.apk sur ton telephone, installe
+   (autorise "sources inconnues").
+
+Pour modifier le quiz : edite www/index.html.
